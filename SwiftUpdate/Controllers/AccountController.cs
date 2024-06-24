@@ -7,24 +7,67 @@ using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using SwiftUpdate.Services;
 
 public class AccountController : Controller
 {
     private readonly SwiftUpdateContext _context;
     private readonly PasswordHasher<UserModel> _passwordHasher;
+    private readonly SessionService _sessionService;
 
-    public AccountController(SwiftUpdateContext context, PasswordHasher<UserModel> passwordHasher)
+    public AccountController(SwiftUpdateContext context, PasswordHasher<UserModel> passwordHasher, SessionService sessionService)
     {
         _context = context;
         _passwordHasher = passwordHasher;
+        _sessionService = sessionService;
     }
 
     // GET: /Account/Login
     [HttpGet]
     public IActionResult Login()
     {
+
+        // Get session information
+        var sessionGuid = HttpContext.Request.Cookies["SessionGuid"]; // Replace with your session cookie name
+
+        // Example: Retrieve session data from service
+        var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty); // Implement this method in your service
+
+        // Pass session data to ViewData or ViewBag
+        if (sessionData != null)
+        {
+            ViewData["SessionData"] = sessionData;
+        }
         return View();
     }
+
+
+
+
+    [HttpGet]
+    public IActionResult Logout()
+    {
+
+        // Get session information
+        var sessionGuid = HttpContext.Request.Cookies["SessionGuid"]; // Replace with your session cookie name
+
+        // Example: Retrieve session data from service
+        var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty); // Implement this method in your service
+
+        // Pass session data to ViewData or ViewBag
+        if (sessionData != null)
+        {
+            ViewData["SessionData"] = string.Empty;
+        }
+
+        _sessionService.DeleteSessionByGuid(sessionGuid ?? string.Empty);
+
+        return RedirectToAction("Login", "Account");
+
+    }
+
+
+
 
     // POST: /Account/Login
     [HttpPost]
@@ -51,6 +94,28 @@ public class AccountController : Controller
 
                     // Create identity object
                     var userIdentity = new ClaimsIdentity(claims, "login");
+
+
+
+
+                    // Generate a unique session ID (you can use GUID or any unique identifier)
+                    string sessionGuid = Guid.NewGuid().ToString();
+
+                    // Set session expiry time (e.g., 30 minutes from now)
+                    DateTime expiryTime = DateTime.Now.AddMinutes(30);
+
+                    // Create session using SessionService
+                    string ResultGuid = _sessionService.CreateSession(sessionGuid, user.UserId, expiryTime);
+
+                    var cookieOptions = new CookieOptions
+                    {
+                        // Set other cookie options as needed, like expiration, domain, etc.
+                        HttpOnly = true, // This restricts cookie access to HTTP requests only
+                        IsEssential = true // This marks the cookie as essential for authentication
+                    };
+
+                    // Set the cookie in the response
+                    HttpContext.Response.Cookies.Append("SessionGuid", ResultGuid, cookieOptions);
 
                     return RedirectToAction("Dashboard", "Home"); 
                 }
@@ -107,11 +172,6 @@ public class AccountController : Controller
         return View(model);
     }
 
-    // GET: /Account/Logout
-    [HttpGet]
-    public async Task<IActionResult> Logout()
-    {
-        await HttpContext.SignOutAsync();
-        return RedirectToAction("Index", "Home"); // Redirect to home page after logout
-    }
+
+  
 }

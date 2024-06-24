@@ -14,6 +14,9 @@ namespace SwiftUpdate.Models
 
         public DbSet<UserModel> Users { get; set; }
         public DbSet<ApplicationModel> Applications { get; set; }
+        public DbSet<SessionModel> Sessions { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +37,15 @@ namespace SwiftUpdate.Models
                 .HasDefaultValueSql("GETDATE()");
 
             modelBuilder.Entity<ApplicationModel>()
+                .Property(a => a.UpdatedAt)
+                .HasDefaultValueSql("GETDATE()");
+
+
+            modelBuilder.Entity<SessionModel>()
+               .Property(a => a.CreatedAt)
+               .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<SessionModel>()
                 .Property(a => a.UpdatedAt)
                 .HasDefaultValueSql("GETDATE()");
         }

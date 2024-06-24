@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SwiftUpdate.Models;
+using SwiftUpdate.Services;
 using System.Diagnostics;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -10,18 +11,36 @@ namespace SwiftUpdate.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly SwiftUpdateContext _context;
         private readonly IWebHostEnvironment _env;
+        private readonly SessionService _sessionService;
 
-        public HomeController(SwiftUpdateContext context, ILogger<HomeController> logger, IWebHostEnvironment env)
+        public HomeController(SwiftUpdateContext context, ILogger<HomeController> logger, IWebHostEnvironment env, SessionService sessionService)
         {
             _logger = logger;
             _context = context;
             _env = env;
-
+            _sessionService = sessionService;
         }
 
         public IActionResult Index()
         {
-            return View();
+            // Get session information
+            var sessionGuid = HttpContext.Request.Cookies["SessionGuid"]; // Replace with your session cookie name
+
+            // Example: Retrieve session data from service
+            var sessionData = _sessionService.GetSessionByGuid(sessionGuid); // Implement this method in your service
+
+            // Pass session data to ViewData or ViewBag
+            if (sessionData != null)
+            {
+                ViewData["SessionData"] = sessionData;
+                return RedirectToAction("Dashboard", "Home");
+
+            } else
+            {
+                return RedirectToAction("Login", "Account");
+
+            }
+
         }
 
         public IActionResult Privacy()
@@ -38,6 +57,21 @@ namespace SwiftUpdate.Controllers
 
         public IActionResult Dashboard()
         {
+            // Get session information
+            var sessionGuid = HttpContext.Request.Cookies["SessionGuid"]; // Replace with your session cookie name
+
+            // Example: Retrieve session data from service
+            var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty); // Implement this method in your service
+
+            // Pass session data to ViewData or ViewBag
+            if (sessionData == null)
+            {
+                ViewData["SessionData"] = string.Empty;
+                return RedirectToAction("Login", "Account");
+            } else
+            {
+                ViewData["SessionData"] = sessionData;
+            }
             List<ApplicationModel> applications = _context.Applications.ToList();
             return View(applications);
         }

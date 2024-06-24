@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SwiftUpdate</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" /> <!-- FontAwesome CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SwiftUpdate.styles.css" asp-append-version="true" />
 </head>
@@ -17,11 +18,25 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-sm-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                        </li>
+                        <!-- Other navbar items -->
+                    </ul>
+
+                    <!-- Right-aligned Logout link with icon -->
+                    <ul class="navbar-nav">
+                        @{
+                            var sessionData = ViewData["SessionData"] as SessionModel; // Replace with your actual session data model
+                            if (sessionData != null && sessionData.ExpiryTime >= DateTime.Now)
+                            {
+                                <li class="nav-item ms-auto">
+                                    <!-- Use ms-auto for margin-left: auto in Bootstrap 5 -->
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">
+                                        <i class="fas fa-sign-out-alt"></i> <!-- FontAwesome logout icon -->
+                                    </a>
+                                </li>
+                            }
+                        }
                     </ul>
                 </div>
             </div>
@@ -35,7 +50,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - SwiftUpdate 
+            &copy; 2024 - SwiftUpdate
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SwiftUpdate.Models;
 
@@ -11,9 +12,11 @@ using SwiftUpdate.Models;
 namespace SwiftUpdate.Migrations
 {
     [DbContext(typeof(SwiftUpdateContext))]
-    partial class SwiftUpdateContextModelSnapshot : ModelSnapshot
+    [Migration("20240624112151_Session-SQL")]
+    partial class SessionSQL
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,8 +87,6 @@ namespace SwiftUpdate.Migrations
 
                     b.HasKey("SessionId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Sessions");
                 });
 
@@ -128,17 +129,6 @@ namespace SwiftUpdate.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("SwiftUpdate.Models.SessionModel", b =>
-                {
-                    b.HasOne("SwiftUpdate.Models.UserModel", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
