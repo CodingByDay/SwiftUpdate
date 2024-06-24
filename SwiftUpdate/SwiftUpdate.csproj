@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
+    <Folder Include="ApplicationData\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,5 +18,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
+	<ItemGroup>
+		<!-- Ensure the ApplicationData folder and its contents are copied to the output directory -->
+		<None Update="ApplicationData\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 </Project>
