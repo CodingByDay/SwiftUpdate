@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using SwiftUpdate.Models;
 using SwiftUpdate.Services;
+using SwiftUpdate.ViewModels;
 using System.Diagnostics;
+using System.IO.Compression;
+using System.Xml;
+using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace SwiftUpdate.Controllers
@@ -201,17 +205,75 @@ namespace SwiftUpdate.Controllers
                 return false;
             }
         }
-
-
-
         public async Task<IActionResult> Versions(int id)
         {
             // Use the 'id' parameter for your logic
             // For example, you might retrieve versions based on the id
-            var Model = await _context.Applications.FindAsync(id);
+            var applicationModel = await _context.Applications.FindAsync(id);
 
-            // Pass the versions to the view
-            return View(Model);
+            // Ensure the application model exists
+            if (applicationModel == null)
+            {
+                return NotFound();
+            }
+
+            // Construct the folder path based on application name
+            string appDataFolderPath = Path.Combine(_env.ContentRootPath, "ApplicationData", applicationModel.ApplicationName);
+
+            // Check if the directory exists
+            if (!Directory.Exists(appDataFolderPath))
+            {
+                return NotFound(); // Handle appropriately if the directory does not exist
+            }
+
+            // Search for APK files
+            var apkFiles = Directory.GetFiles(appDataFolderPath, "*.apk");
+
+            List<int> versionCodes = new List<int>();
+            List<string> fileNames = new List<string>();
+            foreach (var apkFile in apkFiles)
+            {
+                // Extract version code from the file name and convert to int
+                var versionCode = ExtractAndConvertVersionCode(apkFile);
+                if (versionCode.HasValue)
+                {
+                    versionCodes.Add(versionCode.Value);
+                }
+
+                fileNames.Add(apkFile);
+            }
+
+            // Determine the highest version code (active version)
+            int activeVersion = versionCodes.Any() ? versionCodes.Max() : 0;
+
+            // Pass the versions and active version to the view
+            var viewModel = new VersionsViewModel
+            {
+                ApplicationModel = applicationModel,
+                Versions = versionCodes,
+                ActiveVersion = activeVersion,
+                FileNames = fileNames
+            };
+
+            return View(viewModel);
+        }
+
+        private int? ExtractAndConvertVersionCode(string fileName)
+        {
+            // Example: Extract version code from file name following '__v'
+            // Convert to int and return the highest number
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+            var startIndex = fileNameWithoutExtension.LastIndexOf("__v", StringComparison.OrdinalIgnoreCase);
+            if (startIndex != -1 && startIndex + 3 < fileNameWithoutExtension.Length)
+            {
+                var versionString = fileNameWithoutExtension.Substring(startIndex + 3);
+                if (int.TryParse(versionString, out int versionCode))
+                {
+                    return versionCode;
+                }
+            }
+
+            return null; // Return null if version code pattern not found or cannot be parsed
         }
 
     }

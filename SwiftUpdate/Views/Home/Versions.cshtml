@@ -1,15 +1,53 @@
-﻿@model SwiftUpdate.Models.ApplicationModel
+﻿@model SwiftUpdate.ViewModels.VersionsViewModel
 
 @{
     ViewData["Title"] = "Application Details";
 }
 
-<h2>@Model.ApplicationName</h2>
+<h2>@Model.ApplicationModel.ApplicationName</h2>
 
 <div>
-    <p><strong>Active Version:</strong> @Model.CurrentVersion</p>
+    <p><strong>Active Version:</strong> @Model.ActiveVersion</p>
 </div>
 
 <div>
+    <h3>Versions:</h3>
+    <ul>
+        @foreach (var version in Model.Versions)
+        {
+            <li>@version</li>
+        }
+    </ul>
+</div>
+
+<div>
+    <!-- Button for uploading APK file -->
+    <form asp-controller="Home" asp-action="UploadApk" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="apkFile" class="form-label">Upload APK File:</label>
+            <input type="file" class="form-control" id="apkFile" name="apkFile" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+</div>
+
+<div class="mt-3">
+    <!-- Button for deleting APK files -->
+    <form asp-controller="Home" asp-action="DeleteApk" method="post">
+        <div class="mb-3">
+            <label for="apkToDelete" class="form-label">Delete APK File:</label>
+            <select class="form-select" id="apkToDelete" name="apkToDelete" required>
+                <option value="">Select APK File to Delete</option>
+                @foreach (var apk in Model.FileNames)
+                {
+                    <option value="@apk">@apk</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+</div>
+
+<div class="mt-3">
     <a asp-controller="Home" asp-action="Dashboard" class="btn btn-primary">Back to List</a>
 </div>
