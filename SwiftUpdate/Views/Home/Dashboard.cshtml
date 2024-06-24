@@ -21,7 +21,7 @@
                 <td>@app.ApplicationName</td>
                 <td>@app.CurrentVersion</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@app.ApplicationId" class="btn btn-info">Details</a>
+                    <a asp-controller="Home" class="btn btn-primary" asp-action="Versions" asp-route-id ="@app.ApplicationId">Versions</a>
                     <button type="button" class="btn btn-danger" onclick="confirmDelete('@app.ApplicationId')">Delete</button>
                 </td>
             </tr>

@@ -1,0 +1,15 @@
+﻿@model SwiftUpdate.Models.ApplicationModel
+
+@{
+    ViewData["Title"] = "Application Details";
+}
+
+<h2>@Model.ApplicationName</h2>
+
+<div>
+    <p><strong>Active Version:</strong> @Model.CurrentVersion</p>
+</div>
+
+<div>
+    <a asp-controller="Home" asp-action="Dashboard" class="btn btn-primary">Back to List</a>
+</div>

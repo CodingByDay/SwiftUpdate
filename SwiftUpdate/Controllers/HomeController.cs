@@ -169,5 +169,16 @@ namespace SwiftUpdate.Controllers
         }
 
 
+
+        public async Task<IActionResult> Versions(int id)
+        {
+            // Use the 'id' parameter for your logic
+            // For example, you might retrieve versions based on the id
+            var Model = await _context.Applications.FindAsync(id);
+
+            // Pass the versions to the view
+            return View(Model);
+        }
+
     }
 }
