@@ -6,6 +6,14 @@
 
 <h2>@Model.ApplicationModel.ApplicationName</h2>
 
+<!-- Show error notification -->
+@if (!string.IsNullOrEmpty(ViewBag.Error))
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @ViewBag.Error
+    </div>
+}
+
 <div>
     <p><strong>Active Version:</strong> @Model.ActiveVersion</p>
 </div>
@@ -21,14 +29,11 @@
 </div>
 
 <div>
-
+   
 
     <!-- Button for uploading APK file -->
     <form asp-controller="Home" asp-action="UploadApk" method="post" enctype="multipart/form-data">
-
         <input type="hidden" id="applicationId" name="applicationId" value="@Model.ApplicationModel.ApplicationId">
-
-
         <div class="mb-3">
             <label for="apkFile" class="form-label">Upload APK File:</label>
             <input type="file" class="form-control" id="apkFile" name="apkFile" required>
@@ -41,12 +46,13 @@
     <!-- Button for deleting APK files -->
     <form asp-controller="Home" asp-action="DeleteApk" method="post">
         <div class="mb-3">
+            <input type="hidden" id="applicationId" name="applicationId" value="@Model.ApplicationModel.ApplicationId">
             <label for="apkToDelete" class="form-label">Delete APK File:</label>
             <select class="form-select" id="apkToDelete" name="apkToDelete" required>
                 <option value="">Select APK File to Delete</option>
-                @foreach (var apk in Model.FileNames)
+                @foreach (var apk in Model.Versions)
                 {
-                    <option value="@apk">@apk</option>
+                    <option name="apkVersion" value="@apk">@apk</option>
                 }
             </select>
         </div>

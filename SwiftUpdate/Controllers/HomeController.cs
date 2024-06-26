@@ -5,6 +5,7 @@ using SwiftUpdate.Services;
 using SwiftUpdate.ViewModels;
 using System.Diagnostics;
 using System.IO.Compression;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
@@ -122,7 +123,7 @@ namespace SwiftUpdate.Controllers
             }
         }
 
-        // Example method to save application to the database (replace with your actual implementation)
+        // Example method to save application to the database 
         private async Task<bool> SaveApplicationToDatabase(ApplicationModel model)
         {
             try
@@ -258,29 +259,55 @@ namespace SwiftUpdate.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadApk(IFormFile apkFile, int applicationId)
         {
+
+            var applicationModel = await _context.Applications.FindAsync(applicationId);
+            var uploads = Path.Combine(_env.ContentRootPath, "ApplicationData", applicationModel?.ApplicationName ?? string.Empty);
+            var viewModel = Methods.FindAndReturnModelVersions(uploads, applicationModel);
             try
             {
-                var applicationModel = await _context.Applications.FindAsync(applicationId);
-
 
 
                 if (apkFile == null || apkFile.Length == 0)
                 {
-                    ViewBag.Message = "No file selected.";
-                    return View("Versions");
+                    ViewBag.Error = "No file selected.";
+
+                    return View("Versions", viewModel);
                 }
 
                 if (apkFile.Length > _fileSizeLimit)
                 {
-                    ViewBag.Message = "File size exceeds 500 MB limit.";
-                    return View("Versions");
+                    ViewBag.Error = "File size exceeds 500 MB limit.";
+
+                    return View("Versions", viewModel);
                 }
 
-                var uploads = Path.Combine(_env.ContentRootPath, "ApplicationData", applicationModel?.ApplicationName ?? string.Empty);
 
                 if (!Directory.Exists(uploads))
                 {
                     Directory.CreateDirectory(uploads);
+                }
+
+                // Extract version number using Regex
+                string pattern = @"__v(\d+)\.apk$"; // Regex pattern to match version number
+                var match = Regex.Match(apkFile.FileName, pattern);
+
+                if (!match.Success)
+                {
+                    ViewBag.Error = "File name invalid.";
+                    return View("Versions", viewModel);
+                }
+
+                // Extract version number from the uploaded file name
+                string versionNumber = match.Groups[1].Value;
+
+                // Check if a file with the same version number exists
+                var existingFiles = Directory.GetFiles(uploads)
+                    .Where(file => Path.GetFileName(file).Contains($"__v{versionNumber}.apk"));
+
+                if (existingFiles.Any())
+                {
+                    ViewBag.Error = $"A file with version '{versionNumber}' already exists.";
+                    return View("Versions", viewModel);
                 }
 
                 var filePath = Path.Combine(uploads, apkFile.FileName);
@@ -296,16 +323,82 @@ namespace SwiftUpdate.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ViewBag.Message = $"File upload failed: {ex.Message}";
+                    ViewBag.Error = $"File upload failed: {ex.Message}";
                 }
 
 
-                var viewModel = Methods.FindAndReturnModelVersions(uploads, applicationModel);
+                return View("Versions", viewModel);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = ex.Message;
+                return View("Dashboard");
+            }
+        }
+
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteApk(string apkToDelete, int applicationId)
+        {
+            var applicationModel = await _context.Applications.FindAsync(applicationId);
+            var uploadsPath = Path.Combine(_env.ContentRootPath, "ApplicationData", applicationModel.ApplicationName);
+            var viewModel = Methods.FindAndReturnModelVersions(uploadsPath, applicationModel);
+            try
+            {
+        
+
+                if (applicationModel == null)
+                {
+                    ViewBag.Error = "No application model found.";
+                    return View("Versions", viewModel);
+                }
+
+                if (string.IsNullOrEmpty(apkToDelete))
+                {
+                    ViewBag.Error = "No APK file selected for deletion.";
+                    return View("Versions", viewModel);
+                }
+
+                // Construct the directory path where APKs are stored
+
+                // Check if the directory exists
+                if (!Directory.Exists(uploadsPath))
+                {
+                    ViewBag.Error = "Uploads directory not found.";
+                    return View("Versions", viewModel);
+                }
+
+                var filesToDeleteDebug = Directory.GetFiles(uploadsPath);
+
+                // Search for files matching the pattern in the directory
+                var filesToDelete = Directory.GetFiles(uploadsPath)
+                    .Where(file => Path.GetFileName(file).Contains($"__v{apkToDelete}"));
+
+                if (filesToDelete.Count() == 0)
+                {
+                    ViewBag.Error = $"No APK files found starting with '{apkToDelete}_'.";
+                    return View("Versions", viewModel);
+                }
+
+                // Delete each found file
+                foreach (var file in filesToDelete)
+                {
+                    System.IO.File.Delete(file);
+                }
+
+                ViewBag.Message = $"APK file(s) starting with '{apkToDelete}_' deleted successfully.";
 
                 return View("Versions", viewModel);
-            } catch (Exception ex)
+
+            }
+            catch (Exception ex)
             {
-                return View("Dashboard");
+                ViewBag.Error = $"Error deleting APK file: {ex.Message}";
+                return View("Versions", viewModel);
+
             }
         }
 
