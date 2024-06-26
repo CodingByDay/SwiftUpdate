@@ -43,6 +43,7 @@ public class AppUpdateController : ControllerBase
         }
         catch (Exception ex)
         {
+            SentrySdk.CaptureException(ex);
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }
@@ -80,6 +81,7 @@ public class AppUpdateController : ControllerBase
         }
         catch (Exception ex)
         {
+            SentrySdk.CaptureException(ex);
             return StatusCode(500, $"An error occurred: {ex.Message}");
         }
     }

@@ -52,8 +52,7 @@ namespace SwiftUpdate.Helpers
                 return viewModel;
             } catch (Exception ex)
             {
-                // Report the exception.
-
+                SentrySdk.CaptureException(ex);
                 return null;
             }
         }
@@ -91,7 +90,7 @@ namespace SwiftUpdate.Helpers
             }
             catch (Exception ex)
             {
-                // Report the exception.
+                SentrySdk.CaptureException(ex);
                 return new List<int>();
             }
         }
@@ -135,9 +134,8 @@ namespace SwiftUpdate.Helpers
             }
             catch (Exception ex)
             {
-                // Report
+                SentrySdk.CaptureException(ex);
             } 
-
 
             return updatePath;
         }
@@ -146,20 +144,28 @@ namespace SwiftUpdate.Helpers
 
         private static int? ExtractAndConvertVersionCode(string fileName)
         {
-            // Example: Extract version code from file name following '__v'
-            // Convert to int and return the highest number
-            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
-            var startIndex = fileNameWithoutExtension.LastIndexOf("__v", StringComparison.OrdinalIgnoreCase);
-            if (startIndex != -1 && startIndex + 3 < fileNameWithoutExtension.Length)
-            {
-                var versionString = fileNameWithoutExtension.Substring(startIndex + 3);
-                if (int.TryParse(versionString, out int versionCode))
-                {
-                    return versionCode;
-                }
-            }
 
-            return null; // Return null if version code pattern not found or cannot be parsed
+            try
+            {
+                // Example: Extract version code from file name following '__v'
+                // Convert to int and return the highest number
+                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+                var startIndex = fileNameWithoutExtension.LastIndexOf("__v", StringComparison.OrdinalIgnoreCase);
+                if (startIndex != -1 && startIndex + 3 < fileNameWithoutExtension.Length)
+                {
+                    var versionString = fileNameWithoutExtension.Substring(startIndex + 3);
+                    if (int.TryParse(versionString, out int versionCode))
+                    {
+                        return versionCode;
+                    }
+                }
+
+                return null; // Return null if version code pattern not found or cannot be parsed
+            } catch (Exception ex)
+            {
+                SentrySdk.CaptureException(ex);
+                return -1;
+            }
         }
     }
 }

@@ -5,6 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using SwiftUpdate.Models;
 using SwiftUpdate.Services;
 
+
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,11 +18,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<SwiftUpdateContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 524288000; 
 });
+
 builder.Services.Configure<KestrelServerOptions>(options =>
 {
     options.Limits.MaxRequestBodySize = 524288000; 
@@ -26,6 +30,7 @@ builder.Services.Configure<KestrelServerOptions>(options =>
 
 builder.Services.AddScoped<PasswordHasher<UserModel>>();
 builder.Services.AddScoped<SessionService>();
+builder.WebHost.UseSentry(); // Initialize Sentry
 
 
 var app = builder.Build();
@@ -45,11 +50,14 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-
-
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+
 app.Run();
+
+
+

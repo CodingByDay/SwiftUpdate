@@ -29,24 +29,30 @@ namespace SwiftUpdate.Controllers
 
         public IActionResult Index()
         {
-            // Get session information
-            var sessionGuid = HttpContext.Request.Cookies["SessionGuid"]; 
-
-            // Example: Retrieve session data from service
-            var sessionData = _sessionService.GetSessionByGuid(sessionGuid); // Implement this method in your service
-
-            // Pass session data to ViewData or ViewBag
-            if (sessionData != null)
+            try
             {
-                ViewData["SessionData"] = sessionData;
-                return RedirectToAction("Dashboard", "Home");
+                // Get session information
+                var sessionGuid = HttpContext.Request.Cookies["SessionGuid"];
+                // Example: Retrieve session data from service
+                var sessionData = _sessionService.GetSessionByGuid(sessionGuid); // Implement this method in your service
 
-            } else
+                // Pass session data to ViewData or ViewBag
+                if (sessionData != null)
+                {
+                    ViewData["SessionData"] = sessionData;
+                    return RedirectToAction("Dashboard", "Home");
+
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Account");
+
+                }
+            } catch (Exception ex)
             {
+                SentrySdk.CaptureException(ex);
                 return RedirectToAction("Login", "Account");
-
             }
-
         }
 
         public IActionResult Privacy()
@@ -63,63 +69,78 @@ namespace SwiftUpdate.Controllers
 
         public IActionResult Dashboard()
         {
-            // Get session information
-            var sessionGuid = HttpContext.Request.Cookies["SessionGuid"]; 
-
-            // Example: Retrieve session data from service
-            var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty); 
-
-            // Pass session data to ViewData or ViewBag
-            if (sessionData == null)
+            try
             {
-                ViewData["SessionData"] = string.Empty;
-                return RedirectToAction("Login", "Account");
-            } else
+                // Get session information
+                var sessionGuid = HttpContext.Request.Cookies["SessionGuid"];
+
+                // Example: Retrieve session data from service
+                var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
+
+                // Pass session data to ViewData or ViewBag
+                if (sessionData == null)
+                {
+                    ViewData["SessionData"] = string.Empty;
+                    return RedirectToAction("Login", "Account");
+                }
+                else
+                {
+                    ViewData["SessionData"] = sessionData;
+                }
+                List<ApplicationModel> applications = _context.Applications.ToList();
+                return View(applications);
+            } catch (Exception ex)
             {
-                ViewData["SessionData"] = sessionData;
+                SentrySdk.CaptureException(ex);
+                throw;
             }
-            List<ApplicationModel> applications = _context.Applications.ToList();
-            return View(applications);
         }
         // POST: Create a new application
         [HttpPost]
         public async Task<IActionResult> Create(ApplicationModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // Assuming you have a data access layer or repository to save to the database
-                bool success = await SaveApplicationToDatabase(model);
-
-                if (success)
+                if (ModelState.IsValid)
                 {
+                    // Assuming you have a data access layer or repository to save to the database
+                    bool success = await SaveApplicationToDatabase(model);
 
-                    // Get the path to the ApplicationData folder within the app's directory
-                    string appDataFolderPath = Path.Combine(_env.ContentRootPath, "ApplicationData", model.ApplicationName);
-
-                    // Check if the folder exists
-                    if (!Directory.Exists(appDataFolderPath))
+                    if (success)
                     {
-                        // Create the folder if it doesn't exist
-                        Directory.CreateDirectory(appDataFolderPath);
-                        return Json(new { success = true });
+
+                        // Get the path to the ApplicationData folder within the app's directory
+                        string appDataFolderPath = Path.Combine(_env.ContentRootPath, "ApplicationData", model.ApplicationName);
+
+                        // Check if the folder exists
+                        if (!Directory.Exists(appDataFolderPath))
+                        {
+                            // Create the folder if it doesn't exist
+                            Directory.CreateDirectory(appDataFolderPath);
+                            return Json(new { success = true });
+
+                        }
+                        else
+                        {
+                            return Json(new { success = true });
+
+                        }
+
 
                     }
                     else
                     {
-                        return Json(new { success = true });
-
+                        return Json(new { success = false, errorMessage = "Failed to save application." });
                     }
-
-
                 }
                 else
                 {
-                    return Json(new { success = false, errorMessage = "Failed to save application." });
+                    return Json(new { success = false, errorMessage = "Invalid model state." });
                 }
-            }
-            else
+            } catch (Exception ex)
             {
-                return Json(new { success = false, errorMessage = "Invalid model state." });
+                SentrySdk.CaptureException(ex);
+                throw;
             }
         }
 
@@ -136,7 +157,7 @@ namespace SwiftUpdate.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it appropriately
+                SentrySdk.CaptureException(ex);
                 return false;
             }
         }
@@ -182,7 +203,7 @@ namespace SwiftUpdate.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it appropriately
+                SentrySdk.CaptureException(ex);
                 return Json(new { success = false, errorMessage = "Failed to delete application." });
             }
         }
@@ -203,7 +224,7 @@ namespace SwiftUpdate.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it appropriately
+                SentrySdk.CaptureException(ex);
                 return false;
             }
         }
@@ -265,8 +286,6 @@ namespace SwiftUpdate.Controllers
             var viewModel = Methods.FindAndReturnModelVersions(uploads, applicationModel);
             try
             {
-
-
                 if (apkFile == null || apkFile.Length == 0)
                 {
                     ViewBag.Error = "No file selected.";
@@ -331,6 +350,7 @@ namespace SwiftUpdate.Controllers
             }
             catch (Exception ex)
             {
+                SentrySdk.CaptureException(ex);
                 ViewBag.Error = ex.Message;
                 return View("Dashboard");
             }
@@ -349,7 +369,6 @@ namespace SwiftUpdate.Controllers
             try
             {
         
-
                 if (applicationModel == null)
                 {
                     ViewBag.Error = "No application model found.";
@@ -396,6 +415,7 @@ namespace SwiftUpdate.Controllers
             }
             catch (Exception ex)
             {
+                SentrySdk.CaptureException(ex);
                 ViewBag.Error = $"Error deleting APK file: {ex.Message}";
                 return View("Versions", viewModel);
 
