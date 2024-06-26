@@ -1,33 +1,9 @@
 ﻿@model List<SwiftUpdate.Models.ApplicationModel>
 
-<h2>List of Applications</h2>
-
+<div class="dashboard">
 <p>
     <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Create New</a>
 </p>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Application Name</th>
-            <th>Current Version</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var app in Model)
-        {
-            <tr>
-                <td>@app.ApplicationName</td>
-                <td>@app.CurrentVersion</td>
-                <td>
-                    <a asp-controller="Home" class="btn btn-primary" asp-action="Versions" asp-route-id ="@app.ApplicationId">Versions</a>
-                    <button type="button" class="btn btn-danger" onclick="confirmDelete('@app.ApplicationId')">Delete</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
 
 <!-- Modal for Create New Application -->
 <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
@@ -53,10 +29,33 @@
     </div>
 </div>
 
+<div class="table-responsive mt-4">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Application Name</th>
+                <th>Current Version</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var app in Model)
+            {
+                <tr>
+                    <td>@app.ApplicationName</td>
+                    <td>@app.CurrentVersion</td>
+                    <td>
+                        <a asp-controller="Home" class="btn btn-primary" asp-action="Versions" asp-route-id="@app.ApplicationId">Versions</a>
+                        <button type="button" class="btn btn-danger" onclick="confirmDelete('@app.ApplicationId')">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+</div>
 @section Scripts {
     <script>
-
-
         // Handle Save button click
         $('#btnSaveApplication').click(function () {
             var appName = $('#appName').val();
@@ -70,11 +69,8 @@
                     'ApplicationName': appName
                 },
                 success: function (data) {
-
-
                     $('#createModal').modal('hide');
-                    // Optionally, refresh the page or update the table with new data
-                    location.reload(); // Reload the page
+                    location.reload(); // Reload the page to update the table
                 },
                 error: function () {
                     alert('Error saving application.');
@@ -84,25 +80,22 @@
 
         // Function to confirm delete
         function confirmDelete(applicationId) {
-
             if (confirm('Are you sure you want to delete this application?')) {
-                    $.ajax({
-                        url: '/Home/Delete/',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            'ApplicationId': applicationId
-                        },
-                        success: function (data) {
-
-                            location.reload(); // Reload the page
-                        },
-                        error: function () {
-                            alert('Error deleting application.');
-                        }
-                    });         
+                $.ajax({
+                    url: '/Home/Delete/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'ApplicationId': applicationId
+                    },
+                    success: function (data) {
+                        location.reload(); // Reload the page to update the table
+                    },
+                    error: function () {
+                        alert('Error deleting application.');
+                    }
+                });
             }
-
         }
     </script>
 }
