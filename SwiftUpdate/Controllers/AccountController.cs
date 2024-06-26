@@ -26,7 +26,7 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Login()
     {
-
+        ViewData["Account"] = true;
         // Get session information
         var sessionGuid = HttpContext.Request.Cookies["SessionGuid"]; // Replace with your session cookie name
 
@@ -132,6 +132,8 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Register()
     {
+        ViewData["Account"] = true;
+
         return View();
     }
 

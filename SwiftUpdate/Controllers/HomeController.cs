@@ -29,6 +29,7 @@ namespace SwiftUpdate.Controllers
 
         public IActionResult Index()
         {
+
             try
             {
                 // Get session information
@@ -37,7 +38,7 @@ namespace SwiftUpdate.Controllers
                 var sessionData = _sessionService.GetSessionByGuid(sessionGuid); // Implement this method in your service
 
                 // Pass session data to ViewData or ViewBag
-                if (sessionData != null)
+                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
                 {
                     ViewData["SessionData"] = sessionData;
                     return RedirectToAction("Dashboard", "Home");
@@ -78,7 +79,7 @@ namespace SwiftUpdate.Controllers
                 var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
 
                 // Pass session data to ViewData or ViewBag
-                if (sessionData == null)
+                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
                 {
                     ViewData["SessionData"] = string.Empty;
                     return RedirectToAction("Login", "Account");
@@ -101,6 +102,23 @@ namespace SwiftUpdate.Controllers
         {
             try
             {
+                var sessionGuid = HttpContext.Request.Cookies["SessionGuid"];
+
+                // Example: Retrieve session data from service
+                var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
+
+                // Pass session data to ViewData or ViewBag
+                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+                {
+                    ViewData["SessionData"] = string.Empty;
+                    return RedirectToAction("Login", "Account");
+                }
+                else
+                {
+                    ViewData["SessionData"] = sessionData;
+                }
+
+
                 if (ModelState.IsValid)
                 {
                     // Assuming you have a data access layer or repository to save to the database
@@ -168,6 +186,23 @@ namespace SwiftUpdate.Controllers
         {
             try
             {
+                var sessionGuid = HttpContext.Request.Cookies["SessionGuid"];
+
+                // Example: Retrieve session data from service
+                var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
+
+                // Pass session data to ViewData or ViewBag
+                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+                {
+                    ViewData["SessionData"] = string.Empty;
+                    return RedirectToAction("Login", "Account");
+                }
+                else
+                {
+                    ViewData["SessionData"] = sessionData;
+                }
+
+
                 var CompleteModel = await _context.Applications.FindAsync(model.ApplicationId);
                 
                 if(CompleteModel == null)
@@ -230,28 +265,50 @@ namespace SwiftUpdate.Controllers
         }
         public async Task<IActionResult> Versions(int id)
         {
-            // Use the 'id' parameter for your logic
-            // For example, you might retrieve versions based on the id
-            var applicationModel = await _context.Applications.FindAsync(id);
-
-            // Ensure the application model exists
-            if (applicationModel == null)
+            try
             {
-                return NotFound();
-            }
+                var sessionGuid = HttpContext.Request.Cookies["SessionGuid"];
 
-            // Construct the folder path based on application name
-            string appDataFolderPath = Path.Combine(_env.ContentRootPath, "ApplicationData", applicationModel.ApplicationName);
+                // Example: Retrieve session data from service
+                var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
 
-            var viewModel = Methods.FindAndReturnModelVersions(appDataFolderPath, applicationModel);
+                // Pass session data to ViewData or ViewBag
+                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+                {
+                    ViewData["SessionData"] = string.Empty;
+                    return RedirectToAction("Login", "Account");
+                }
+                else
+                {
+                    ViewData["SessionData"] = sessionData;
+                }
+                // Use the 'id' parameter for your logic
+                // For example, you might retrieve versions based on the id
+                var applicationModel = await _context.Applications.FindAsync(id);
 
-            if (viewModel != null)
+                // Ensure the application model exists
+                if (applicationModel == null)
+                {
+                    return NotFound();
+                }
+
+                // Construct the folder path based on application name
+                string appDataFolderPath = Path.Combine(_env.ContentRootPath, "ApplicationData", applicationModel.ApplicationName);
+
+                var viewModel = Methods.FindAndReturnModelVersions(appDataFolderPath, applicationModel);
+
+                if (viewModel != null)
+                {
+                    return View(viewModel);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            } catch(Exception ex)
             {
-                return View(viewModel);
-            }
-            else
-            {
-                return NotFound();
+                SentrySdk.CaptureException(ex);
+                throw;
             }
         }
 
@@ -286,6 +343,22 @@ namespace SwiftUpdate.Controllers
             var viewModel = Methods.FindAndReturnModelVersions(uploads, applicationModel);
             try
             {
+                var sessionGuid = HttpContext.Request.Cookies["SessionGuid"];
+
+                // Example: Retrieve session data from service
+                var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
+
+                // Pass session data to ViewData or ViewBag
+                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+                {
+                    ViewData["SessionData"] = string.Empty;
+                    return RedirectToAction("Login", "Account");
+                }
+                else
+                {
+                    ViewData["SessionData"] = sessionData;
+                }
+
                 if (apkFile == null || apkFile.Length == 0)
                 {
                     ViewBag.Error = "No file selected.";
@@ -368,7 +441,23 @@ namespace SwiftUpdate.Controllers
             var viewModel = Methods.FindAndReturnModelVersions(uploadsPath, applicationModel);
             try
             {
-        
+
+                var sessionGuid = HttpContext.Request.Cookies["SessionGuid"];
+
+                // Example: Retrieve session data from service
+                var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
+
+                // Pass session data to ViewData or ViewBag
+                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+                {
+                    ViewData["SessionData"] = string.Empty;
+                    return RedirectToAction("Login", "Account");
+                }
+                else
+                {
+                    ViewData["SessionData"] = sessionData;
+                }
+
                 if (applicationModel == null)
                 {
                     ViewBag.Error = "No application model found.";

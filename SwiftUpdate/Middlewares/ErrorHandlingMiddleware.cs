@@ -37,7 +37,7 @@ public class ErrorHandlingMiddleware
         context.Response.ContentType = "text/html"; // Set content type to HTML
 
         // Render the custom error view
-        var errorView = File.ReadAllText(Path.Combine(_env.ContentRootPath, "Views", "Shared", "Error.cshtml"));
+        var errorView = File.ReadAllText(Path.Combine(_env.ContentRootPath, "Views", "Shared", "_Error.cshtml"));
         return context.Response.WriteAsync(errorView);
     }
 

@@ -26,8 +26,14 @@
                     <!-- Right-aligned Logout link with icon -->
                     <ul class="navbar-nav">
                         @{
+                            bool? account = false;
+                            if (ViewData["Account"]!=null)
+                            {
+                                account = ViewData["Account"] as bool?;
+                            }
+                            bool isAccountDef = account ?? false;
                             var sessionData = ViewData["SessionData"] as SessionModel; // Replace with your actual session data model
-                            if (sessionData != null && sessionData.ExpiryTime >= DateTime.Now)
+                            if (sessionData != null && sessionData.ExpiryTime >= DateTime.Now && !isAccountDef)
                             {
                                 <li class="nav-item ms-auto">
                                     <!-- Use ms-auto for margin-left: auto in Bootstrap 5 -->
