@@ -15,15 +15,37 @@ public class AppUpdateController : ControllerBase
         _env = env;
         _context = context;
     }
+
+
     [HttpGet("download-update")]
-    public IActionResult DownloadUpdate()
+    public IActionResult DownloadUpdate(string applicationName)
     {
-        // Implement logic to retrieve the latest APK file path
+        try
+        {
+            if (string.IsNullOrEmpty(applicationName))
+            {
+                return BadRequest("Application name is required.");
+            }
 
-        // For testing purposes, return a string indicating the endpoint is working
-        return Ok("Download update endpoint is working!");
+            var uploadsPath = Path.Combine(_env.ContentRootPath, "ApplicationData", applicationName);
+
+            var apkFilePath = Methods.FindAndReturnUpdatePath(uploadsPath);
+
+            if (string.IsNullOrEmpty(apkFilePath))
+            {
+                return NotFound("No update found for the specified application.");
+            }
+
+            // Serve the file for download
+            var fileBytes = System.IO.File.ReadAllBytes(apkFilePath);
+            var fileName = Path.GetFileName(apkFilePath);
+            return File(fileBytes, "application/vnd.android.package-archive", fileName);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
     }
-
 
 
     [HttpGet("check-for-update")]

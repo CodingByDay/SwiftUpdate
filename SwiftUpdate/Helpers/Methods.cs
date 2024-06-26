@@ -96,6 +96,53 @@ namespace SwiftUpdate.Helpers
             }
         }
 
+        public static string FindAndReturnUpdatePath(string AppFolder)
+        {
+            string updatePath = string.Empty;
+            try
+            {
+                // Construct the folder path based on application name
+                string appDataFolderPath = AppFolder;
+                // Check if the directory exists
+                if (!Directory.Exists(appDataFolderPath))
+                {
+                    updatePath = string.Empty;
+                }
+                // Search for APK files
+                var apkFiles = Directory.GetFiles(appDataFolderPath, "*.apk");
+                List<int> versionCodes = new List<int>();
+                foreach (var apkFile in apkFiles)
+                {
+                    // Extract version code from the file name and convert to int
+                    var versionCode = ExtractAndConvertVersionCode(apkFile);
+                    if (versionCode.HasValue)
+                    {
+                        versionCodes.Add(versionCode.Value);
+                    }
+                }
+                int max = versionCodes.Max();
+                // Determine the highest version code (active version)
+                foreach (var apkFile in apkFiles)
+                {
+                    // Extract version code from the file name and convert to int
+                    var versionCode = ExtractAndConvertVersionCode(apkFile);
+                    if (versionCode == max)
+                    {
+                        updatePath = apkFile;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Report
+            } 
+
+
+            return updatePath;
+        }
+
+
 
         private static int? ExtractAndConvertVersionCode(string fileName)
         {
