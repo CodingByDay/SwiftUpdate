@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SwiftUpdate.Helpers;
 using SwiftUpdate.Models;
 using SwiftUpdate.Services;
 using SwiftUpdate.ViewModels;
@@ -28,7 +29,7 @@ namespace SwiftUpdate.Controllers
         public IActionResult Index()
         {
             // Get session information
-            var sessionGuid = HttpContext.Request.Cookies["SessionGuid"]; // Replace with your session cookie name
+            var sessionGuid = HttpContext.Request.Cookies["SessionGuid"]; 
 
             // Example: Retrieve session data from service
             var sessionData = _sessionService.GetSessionByGuid(sessionGuid); // Implement this method in your service
@@ -62,10 +63,10 @@ namespace SwiftUpdate.Controllers
         public IActionResult Dashboard()
         {
             // Get session information
-            var sessionGuid = HttpContext.Request.Cookies["SessionGuid"]; // Replace with your session cookie name
+            var sessionGuid = HttpContext.Request.Cookies["SessionGuid"]; 
 
             // Example: Retrieve session data from service
-            var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty); // Implement this method in your service
+            var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty); 
 
             // Pass session data to ViewData or ViewBag
             if (sessionData == null)
@@ -220,42 +221,16 @@ namespace SwiftUpdate.Controllers
             // Construct the folder path based on application name
             string appDataFolderPath = Path.Combine(_env.ContentRootPath, "ApplicationData", applicationModel.ApplicationName);
 
-            // Check if the directory exists
-            if (!Directory.Exists(appDataFolderPath))
+            var viewModel = Methods.FindAndReturnModelVersions(appDataFolderPath, applicationModel);
+
+            if (viewModel != null)
             {
-                return NotFound(); // Handle appropriately if the directory does not exist
+                return View(viewModel);
             }
-
-            // Search for APK files
-            var apkFiles = Directory.GetFiles(appDataFolderPath, "*.apk");
-
-            List<int> versionCodes = new List<int>();
-            List<string> fileNames = new List<string>();
-            foreach (var apkFile in apkFiles)
+            else
             {
-                // Extract version code from the file name and convert to int
-                var versionCode = ExtractAndConvertVersionCode(apkFile);
-                if (versionCode.HasValue)
-                {
-                    versionCodes.Add(versionCode.Value);
-                }
-
-                fileNames.Add(apkFile);
+                return NotFound();
             }
-
-            // Determine the highest version code (active version)
-            int activeVersion = versionCodes.Any() ? versionCodes.Max() : 0;
-
-            // Pass the versions and active version to the view
-            var viewModel = new VersionsViewModel
-            {
-                ApplicationModel = applicationModel,
-                Versions = versionCodes,
-                ActiveVersion = activeVersion,
-                FileNames = fileNames
-            };
-
-            return View(viewModel);
         }
 
         private int? ExtractAndConvertVersionCode(string fileName)
@@ -274,6 +249,64 @@ namespace SwiftUpdate.Controllers
             }
 
             return null; // Return null if version code pattern not found or cannot be parsed
+        }
+
+
+
+        private readonly long _fileSizeLimit = 500L * 1024 * 1024; // 500 MB
+
+        [HttpPost]
+        public async Task<IActionResult> UploadApk(IFormFile apkFile, int applicationId)
+        {
+            try
+            {
+                var applicationModel = await _context.Applications.FindAsync(applicationId);
+
+
+
+                if (apkFile == null || apkFile.Length == 0)
+                {
+                    ViewBag.Message = "No file selected.";
+                    return View("Versions");
+                }
+
+                if (apkFile.Length > _fileSizeLimit)
+                {
+                    ViewBag.Message = "File size exceeds 500 MB limit.";
+                    return View("Versions");
+                }
+
+                var uploads = Path.Combine(_env.ContentRootPath, "ApplicationData", applicationModel?.ApplicationName ?? string.Empty);
+
+                if (!Directory.Exists(uploads))
+                {
+                    Directory.CreateDirectory(uploads);
+                }
+
+                var filePath = Path.Combine(uploads, apkFile.FileName);
+
+                try
+                {
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await apkFile.CopyToAsync(stream);
+                    }
+
+                    ViewBag.Message = "File uploaded successfully.";
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.Message = $"File upload failed: {ex.Message}";
+                }
+
+
+                var viewModel = Methods.FindAndReturnModelVersions(uploads, applicationModel);
+
+                return View("Versions", viewModel);
+            } catch (Exception ex)
+            {
+                return View("Dashboard");
+            }
         }
 
     }

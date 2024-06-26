@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using SwiftUpdate.Models;
 using SwiftUpdate.Services;
@@ -11,6 +13,16 @@ builder.Services.AddControllersWithViews();
 // Configure DbContext with SQL Server
 builder.Services.AddDbContext<SwiftUpdateContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 524288000; 
+});
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = 524288000; 
+});
 
 builder.Services.AddScoped<PasswordHasher<UserModel>>();
 builder.Services.AddScoped<SessionService>();

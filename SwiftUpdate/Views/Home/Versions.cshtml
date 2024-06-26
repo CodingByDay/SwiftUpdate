@@ -21,8 +21,14 @@
 </div>
 
 <div>
+
+
     <!-- Button for uploading APK file -->
     <form asp-controller="Home" asp-action="UploadApk" method="post" enctype="multipart/form-data">
+
+        <input type="hidden" id="applicationId" name="applicationId" value="@Model.ApplicationModel.ApplicationId">
+
+
         <div class="mb-3">
             <label for="apkFile" class="form-label">Upload APK File:</label>
             <input type="file" class="form-control" id="apkFile" name="apkFile" required>
