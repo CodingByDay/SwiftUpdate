@@ -59,6 +59,44 @@ namespace SwiftUpdate.Helpers
         }
 
 
+        public static List<int> FindAndReturnModelVersionsApi(string AppFolder)
+        {
+            try
+            {
+                // Construct the folder path based on application name
+                string appDataFolderPath = AppFolder;
+
+                // Check if the directory exists
+                if (!Directory.Exists(appDataFolderPath))
+                {
+                    return null; // Handle appropriately if the directory does not exist
+                }
+
+                // Search for APK files
+                var apkFiles = Directory.GetFiles(appDataFolderPath, "*.apk");
+                List<int> versionCodes = new List<int>();
+                foreach (var apkFile in apkFiles)
+                {
+                    // Extract version code from the file name and convert to int
+                    var versionCode = ExtractAndConvertVersionCode(apkFile);
+                    if (versionCode.HasValue)
+                    {
+                        versionCodes.Add(versionCode.Value);
+                    }
+
+                }
+                // Determine the highest version code (active version)
+                int activeVersion = versionCodes.Any() ? versionCodes.Max() : 0;
+                return versionCodes;
+            }
+            catch (Exception ex)
+            {
+                // Report the exception.
+                return new List<int>();
+            }
+        }
+
+
         private static int? ExtractAndConvertVersionCode(string fileName)
         {
             // Example: Extract version code from file name following '__v'
