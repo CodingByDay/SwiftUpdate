@@ -34,7 +34,7 @@
         <thead>
             <tr>
                 <th>Application Name</th>
-                <th>Current Version</th>
+                    <!-- <th>Current Version</th> For now not needed time constraints. TODO-->
                 <th>Actions</th>
             </tr>
         </thead>
@@ -43,7 +43,6 @@
             {
                 <tr>
                     <td>@app.ApplicationName</td>
-                    <td>@app.CurrentVersion</td>
                     <td>
                         <a asp-controller="Home" class="btn btn-primary" asp-action="Versions" asp-route-id="@app.ApplicationId">Versions</a>
                         <button type="button" class="btn btn-danger" onclick="confirmDelete('@app.ApplicationId')">Delete</button>
