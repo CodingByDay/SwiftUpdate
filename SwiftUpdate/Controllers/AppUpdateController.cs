@@ -56,7 +56,7 @@ public class AppUpdateController : ControllerBase
         {
             if (string.IsNullOrEmpty(applicationName))
             {
-                return BadRequest("Application name is required.");
+                return BadRequest("");
             }
 
             var uploadsPath = Path.Combine(_env.ContentRootPath, "ApplicationData", applicationName);
@@ -65,18 +65,18 @@ public class AppUpdateController : ControllerBase
 
             if (versions == null || versions.Count == 0)
             {
-                return NotFound("No versions found for the specified application.");
+                return NotFound("");
             }
 
             var currentMax = versions.Max();
 
             if (currentMax > versionCode)
             {
-                return Ok("New update available!");
+                return Ok($"wms_{currentMax}.apk");
             }
             else
             {
-                return Ok("No new updates available!");
+                return Ok("");
             }
         }
         catch (Exception ex)
