@@ -417,6 +417,10 @@ namespace SwiftUpdate.Controllers
                 }
 
 
+                // Refresh the view model. 28.06.2024 Janko Jovièiæ
+                viewModel = Methods.FindAndReturnModelVersions(uploads, applicationModel);
+
+
                 return View("Versions", viewModel);
             }
             catch (Exception ex)
@@ -437,6 +441,7 @@ namespace SwiftUpdate.Controllers
             var applicationModel = await _context.Applications.FindAsync(applicationId);
             var uploadsPath = Path.Combine(_env.ContentRootPath, "ApplicationData", applicationModel.ApplicationName);
             var viewModel = Methods.FindAndReturnModelVersions(uploadsPath, applicationModel);
+
             try
             {
 
@@ -485,7 +490,7 @@ namespace SwiftUpdate.Controllers
 
                 if (filesToDelete.Count() == 0)
                 {
-                    ViewBag.Error = $"No APK files found starting with '{apkToDelete}_'.";
+                    ViewBag.Error = $"No APK files found starting with '__v{apkToDelete}'.";
                     return View("Versions", viewModel);
                 }
 
@@ -495,11 +500,14 @@ namespace SwiftUpdate.Controllers
                     System.IO.File.Delete(file);
                 }
 
-                ViewBag.Message = $"APK file(s) starting with '{apkToDelete}_' deleted successfully.";
+                ViewBag.Message = $"APK file starting deleted successfully.";
+                // Refresh the view model. 28.06.2024 Janko Jovièiæ
+                viewModel = Methods.FindAndReturnModelVersions(uploadsPath, applicationModel);
 
                 return View("Versions", viewModel);
 
             }
+
             catch (Exception ex)
             {
                 SentrySdk.CaptureException(ex);

@@ -248,6 +248,17 @@ h2 {
     width: 100vh;
 }
 
+#loader {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    display: none;
+}
 
-
+#main.loading {
+    overflow: hidden;
+    visibility:hidden;
+}
 

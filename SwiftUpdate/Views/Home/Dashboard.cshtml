@@ -56,7 +56,6 @@
 @section Scripts {
     <script>
 
-
         // Handle Save button click
         $('#btnSaveApplication').click(function () {
             var appName = $('#appName').val();
@@ -81,22 +80,33 @@
 
         // Function to confirm delete
         function confirmDelete(applicationId) {
-            if (confirm('Are you sure you want to delete this application?')) {
-                $.ajax({
-                    url: '/Home/Delete/',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        'ApplicationId': applicationId
+                swal("Are you sure you want to delete this application?", {
+                    buttons: {
+                        cancel: "No",
+                        confirm: "Yes"
                     },
-                    success: function (data) {
-                        location.reload(); // Reload the page to update the table
-                    },
-                    error: function () {
-                        alert('Error deleting application.');
+                })
+                .then((value) => {
+                    if (value) {
+                        $.ajax({
+                            url: '/Home/Delete/',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                'ApplicationId': applicationId
+                            },
+                            success: function (data) {
+                                location.reload(); // Reload the page to update the table
+                            },
+                            error: function () {
+                                swal('Error deleting application.');
+                            }
+                        });                      
                     }
                 });
-            }
         }
+
+
+
     </script>
 }

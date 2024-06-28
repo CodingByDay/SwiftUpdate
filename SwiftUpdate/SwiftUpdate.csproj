@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="ApplicationData\" />
-    <Folder Include="wwwroot\img\" />
   </ItemGroup>
 
   <ItemGroup>
