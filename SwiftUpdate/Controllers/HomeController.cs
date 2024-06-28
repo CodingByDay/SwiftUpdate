@@ -188,10 +188,8 @@ namespace SwiftUpdate.Controllers
             {
                 var sessionGuid = HttpContext.Request.Cookies["SessionGuid"];
 
-                // Example: Retrieve session data from service
                 var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
 
-                // Pass session data to ViewData or ViewBag
                 if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
                 {
                     ViewData["SessionData"] = string.Empty;
