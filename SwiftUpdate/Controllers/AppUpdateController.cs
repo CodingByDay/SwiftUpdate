@@ -16,7 +16,16 @@ public class AppUpdateController : ControllerBase
         _context = context;
     }
 
-
+    /// <summary>
+    /// Downloads the update
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     GET /api/app/download-update?applicationName=WMS
+    ///
+    /// </remarks>
+    /// <returns>application/vnd.android.package-archive.</returns>
     [HttpGet("download-update")]
     public IActionResult DownloadUpdate(string applicationName)
     {
@@ -48,7 +57,15 @@ public class AppUpdateController : ControllerBase
         }
     }
 
-
+    /// <summary>
+    /// Checks for a new update
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     GET /api/app/check-for-update?applicationName=WMS&amp;versionCode=1001
+    /// </remarks>
+    /// <returns>The name of the file.</returns>
     [HttpGet("check-for-update")]
     public IActionResult CheckForUpdate(string applicationName, int versionCode)
     {
