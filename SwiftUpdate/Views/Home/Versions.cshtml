@@ -44,7 +44,7 @@
     </div>
 
     <div class="delete-apk mt-3">
-        <form asp-controller="Home" asp-action="DeleteApk" method="post">
+        <form asp-controller="Home" asp-action="DeleteApk" method="post" id="deleteForm">
             <input type="hidden" id="applicationId" name="applicationId" value="@Model.ApplicationModel.ApplicationId">
             <div class="mb-3">
                 <label for="apkToDelete" class="form-label">Select APK File to Delete:</label>
@@ -52,11 +52,11 @@
                     <option value="">Select APK File to Delete</option>
                     @foreach (var apk in Model.Versions)
                     {
-                            <option name="apkVersion" value="@apk">@apk</option>
+                        <option value="@apk">@apk</option>
                     }
                 </select>
             </div>
-            <button type="submit" class="btn btn-danger">
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">
                 <i class="fas fa-trash"></i> Delete
             </button>
         </form>

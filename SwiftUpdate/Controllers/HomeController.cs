@@ -38,7 +38,7 @@ namespace SwiftUpdate.Controllers
                 var sessionData = _sessionService.GetSessionByGuid(sessionGuid); // Implement this method in your service
 
                 // Pass session data to ViewData or ViewBag
-                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+                if (sessionData != null && sessionData?.ExpiryTime > DateTime.Now)
                 {
                     ViewData["SessionData"] = sessionData;
                     return RedirectToAction("Dashboard", "Home");
@@ -78,15 +78,13 @@ namespace SwiftUpdate.Controllers
                 // Example: Retrieve session data from service
                 var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
 
-                // Pass session data to ViewData or ViewBag
-                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+                if (sessionData != null && sessionData?.ExpiryTime > DateTime.Now)
                 {
-                    ViewData["SessionData"] = string.Empty;
-                    return RedirectToAction("Login", "Account");
+                    ViewData["SessionData"] = sessionData;
                 }
                 else
                 {
-                    ViewData["SessionData"] = sessionData;
+                    return RedirectToAction("Login", "Account");
                 }
                 List<ApplicationModel> applications = _context.Applications.ToList();
                 return View(applications);
@@ -107,15 +105,14 @@ namespace SwiftUpdate.Controllers
                 // Example: Retrieve session data from service
                 var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
 
-                // Pass session data to ViewData or ViewBag
-                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+
+                if (sessionData != null && sessionData?.ExpiryTime > DateTime.Now)
                 {
-                    ViewData["SessionData"] = string.Empty;
-                    return RedirectToAction("Login", "Account");
+                    ViewData["SessionData"] = sessionData;
                 }
                 else
                 {
-                    ViewData["SessionData"] = sessionData;
+                    return RedirectToAction("Login", "Account");
                 }
 
 
@@ -190,14 +187,13 @@ namespace SwiftUpdate.Controllers
 
                 var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
 
-                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+                if (sessionData != null && sessionData?.ExpiryTime > DateTime.Now)
                 {
-                    ViewData["SessionData"] = string.Empty;
-                    return RedirectToAction("Login", "Account");
+                    ViewData["SessionData"] = sessionData;
                 }
                 else
                 {
-                    ViewData["SessionData"] = sessionData;
+                    return RedirectToAction("Login", "Account");
                 }
 
 
@@ -271,14 +267,13 @@ namespace SwiftUpdate.Controllers
                 var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
 
                 // Pass session data to ViewData or ViewBag
-                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+                if (sessionData != null && sessionData?.ExpiryTime > DateTime.Now)
                 {
-                    ViewData["SessionData"] = string.Empty;
-                    return RedirectToAction("Login", "Account");
+                    ViewData["SessionData"] = sessionData;
                 }
                 else
                 {
-                    ViewData["SessionData"] = sessionData;
+                    return RedirectToAction("Login", "Account");
                 }
                 // Use the 'id' parameter for your logic
                 // For example, you might retrieve versions based on the id
@@ -347,14 +342,13 @@ namespace SwiftUpdate.Controllers
                 var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
 
                 // Pass session data to ViewData or ViewBag
-                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+                if (sessionData != null && sessionData?.ExpiryTime > DateTime.Now)
                 {
-                    ViewData["SessionData"] = string.Empty;
-                    return RedirectToAction("Login", "Account");
+                    ViewData["SessionData"] = sessionData;
                 }
                 else
                 {
-                    ViewData["SessionData"] = sessionData;
+                    return RedirectToAction("Login", "Account");
                 }
 
                 if (apkFile == null || apkFile.Length == 0)
@@ -451,14 +445,13 @@ namespace SwiftUpdate.Controllers
                 var sessionData = _sessionService.GetSessionByGuid(sessionGuid ?? string.Empty);
 
                 // Pass session data to ViewData or ViewBag
-                if (sessionData == null && sessionData?.ExpiryTime > DateTime.Now)
+                if (sessionData != null && sessionData?.ExpiryTime > DateTime.Now)
                 {
-                    ViewData["SessionData"] = string.Empty;
-                    return RedirectToAction("Login", "Account");
+                    ViewData["SessionData"] = sessionData;
                 }
                 else
                 {
-                    ViewData["SessionData"] = sessionData;
+                    return RedirectToAction("Login", "Account");
                 }
 
                 if (applicationModel == null)
