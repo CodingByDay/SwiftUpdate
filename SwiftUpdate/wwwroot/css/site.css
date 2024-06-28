@@ -19,7 +19,7 @@ html {
 }
 
 body {
-    margin-bottom: 60px;
+    background: url("../assets/img/");
 }
 
 /* Center container */
@@ -30,42 +30,51 @@ body {
     height: inherit; /* Full viewport height */
 }
 
-/* Login form */
 .login-form {
-    background-color: #ffffff; /* White background */
-    padding: 2rem; /* Padding around the form */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    max-width: 800px; /* Increased max width for the form */
-    display: flex; /* Flexbox layout */
-    flex-direction: column; /* Vertical stacking of elements */
+    background-color: #f8f9fa; /* Light grey background */
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Increased shadow */
+    max-width: 500px; /* Adjusted max-width */
+    margin: auto; /* Center the form */
 }
+
+/* Login form */
+.register-form {
+    background-color: #f8f9fa; /* Light grey background */
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Increased shadow */
+    max-width: 500px; /* Adjusted max-width */
+    margin: auto; /* Center the form */
+}
+
+
 
 .form-group {
     margin-bottom: 1rem; /* Spacing between form groups */
 }
 
 label {
-    font-weight: bold; /* Bold labels */
-    margin-bottom: 0.5rem; /* Spacing below labels */
+    font-weight: bold;
+    margin-bottom: 0.5rem;
     display: block;
+    color: #333; /* Adjusted label color */
 }
 
 .form-control {
-    padding: 0.75rem; /* Padding inside inputs */
-    border: 1px solid #ced4da; /* Light grey border */
-    border-radius: 4px; /* Rounded corners */
-    width: 100%;
-    box-sizing: border-box; /* Ensure padding is included in width */
+    padding: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 button[type="submit"] {
-    padding: 0.75rem; /* Padding inside button */
-    font-size: 1rem; /* Larger font size */
-    border: none; /* Remove border */
-    border-radius: 4px; /* Rounded corners */
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s; /* Smooth transition on hover */
+    transition: background-color 0.3s, transform 0.2s;
 }
 
     button[type="submit"].btn-primary {
@@ -74,7 +83,8 @@ button[type="submit"] {
     }
 
         button[type="submit"].btn-primary:hover {
-            background-color: #0056b3; /* Darker blue on hover */
+            background-color: #0056b3;
+            transform: translateY(-1px);
         }
 
     button[type="submit"].btn-danger {
@@ -93,12 +103,13 @@ button[type="submit"] {
 }
 
 .text-primary {
-    color: #007bff; /* Bootstrap primary color */
-    text-decoration: none; /* Remove underline */
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.2s;
 }
 
     .text-primary:hover {
-        text-decoration: underline; /* Underline on hover */
+        text-decoration: underline;
     }
 
 /* Validation summary */
@@ -262,3 +273,27 @@ h2 {
     visibility:hidden;
 }
 
+@media (max-width: 576px) {
+    .login-form {
+        padding: 1.5rem;
+    }
+
+    .form-control {
+        padding: 0.75rem;
+    }
+}
+
+
+form#uploadForm {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between
+}
+
+
+
+form#deleteForm {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between
+}

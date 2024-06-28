@@ -34,7 +34,6 @@
         <form asp-controller="Home"  id="uploadForm" asp-action="UploadApk" method="post" enctype="multipart/form-data">
             <input type="hidden" id="applicationId" name="applicationId" value="@Model.ApplicationModel.ApplicationId">
             <div class="mb-3">
-                <label for="apkFile" class="form-label">Choose APK File:</label>
                 <input type="file" class="form-control" id="apkFile" name="apkFile" required>
             </div>
             <button type="submit" class="btn btn-primary">
@@ -47,7 +46,6 @@
         <form asp-controller="Home" asp-action="DeleteApk" method="post" id="deleteForm">
             <input type="hidden" id="applicationId" name="applicationId" value="@Model.ApplicationModel.ApplicationId">
             <div class="mb-3">
-                <label for="apkToDelete" class="form-label">Select APK File to Delete:</label>
                 <select class="form-select" id="apkToDelete" name="apkToDelete" required>
                     <option value="">Select APK File to Delete</option>
                     @foreach (var apk in Model.Versions)

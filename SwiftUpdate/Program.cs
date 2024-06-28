@@ -52,9 +52,11 @@ app.UseAuthorization();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
+
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Landing}/{action=Index}/{id?}");
 
 
 app.Run();
